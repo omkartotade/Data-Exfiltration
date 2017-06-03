@@ -1,0 +1,18 @@
+
+
+Description-
+
+
+secret_sender is a program that performs data exfiltration on the server. 
+It takes the desination_ip, the type of interface, the type of packet and the actual message to be exfiltrated as command line arguments. 
+The program then uses scapy to send a custom-made packet of the type specified in the command line (ICMP Echo Request, TCP SYN or UDP) and manipulates the IP header of every packet. 
+We use the 'Identification' and the 'Fragment Offset' fields of the IP header to exfiltrate the data that is provided in the command line as message. We encode every character of the message in the Identification field, along with a randomly generated ID for that packet. 
+So the higher 8 bits of the Identification field are set to the ASCII hex value of the character in the message and the lower 8 bits are encoded with the randomly generated ID.
+
+The program then manipulates the fragment offset field of the IP packet. The fragment offset of the first packet is set as 0, for the second packet it is set as 1, for the third packet it is set as 2 and so on. 
+Finally, when the entire message is sent charcater by character, we send the last packet in which the higher 8 bits of the Identification field are set as 0 and the lower 8 bits are set as the same randomly generated ID, the first bit of the fragment offset is set as 1 and the remaining 12 bits are set as the number of the packets sent.
+
+The program uses scapy-python which is a tool that allows direct manipulation of network packets at any layer. We use the 'send()' command of scapy to actually create a packet with custom values for various fields. 
+If we do not specify a particular field for the packet, scapy assigns the default value to that field.
+ 
+The program does this for all of the three types of packets used in this assignment, i.e. ICMP Echo Request, TCP SYN and UDP packets.
